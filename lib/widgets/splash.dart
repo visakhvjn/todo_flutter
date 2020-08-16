@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
+import 'package:todo/helpers/globals.dart';
 import 'package:todo/helpers/graphql.dart';
 
 class Splash extends StatefulWidget
@@ -29,14 +30,12 @@ class SplashState extends State<Splash>
 		);
 
 		final QueryResult result = await graphQLClient.query(options);
-		final response = jsonDecode(result.data);
+
+		var response = jsonDecode(jsonEncode(result.data.toString()));
 
 		print(response);
 
-		print(result.data);
-		print(result.loading);
-
-		// gUser = responseJSON.user;
+		// gUser = response["user"];
 
 		if (!result.loading)
 		{
