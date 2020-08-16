@@ -20,6 +20,7 @@ query
 		{
 			categoryId,
 			name,
+			type,
 			created,
 			count,
 			tasks
@@ -27,9 +28,30 @@ query
 				taskId,
 				title,
 				created,
-				description
+				description,
+				isCompleted
 			}
 		}
+	}
+}
+""";
+
+final String createCategoryQuery = """
+mutation(\$name: String!, \$type: String!, \$userId: Int!)
+{
+	createCategory(name: \$name , type: \$type, userId: \$userId)
+	{
+		categoryId, name
+	}
+}
+""";
+
+final String createTaskQuery = """
+mutation(\$title: String!, \$description: String!, \$categoryId: Int!, \$parentId: Int!, \$userId: Int!)
+{
+	createTask(title: \$title, description: \$description, parentId: \$parentId, categoryId: \$categoryId, userId: \$userId)
+	{
+		taskId
 	}
 }
 """;
