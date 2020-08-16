@@ -6,12 +6,29 @@ final GraphQLClient graphQLClient = GraphQLClient
 	link: HttpLink(uri: "https://vjnvisakh-todo.herokuapp.com/graphql")
 );
 
-final String getUserCategoriesQuery = """
+final String getUserData = """
 query
 {
-	categories
+	user(userId: 1)
 	{
-		categoryId, created, type, userId
+		userId,
+		name,
+		email,
+		picture,
+		googleId,
+		categories
+		{
+			categoryId,
+			created,
+			count,
+			tasks
+			{
+				taskId,
+				title,
+				created,
+				description
+			}
+		}
 	}
 }
 """;

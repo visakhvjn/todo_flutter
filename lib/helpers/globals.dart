@@ -1,1 +1,1 @@
-var userCategories;
+var gUser;

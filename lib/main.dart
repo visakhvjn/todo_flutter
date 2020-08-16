@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/widgets/home.dart';
 import 'package:todo/widgets/splash.dart';
 
 void main()
@@ -19,7 +20,11 @@ class Todo extends StatelessWidget
 				primarySwatch: Colors.blue,
 				visualDensity: VisualDensity.adaptivePlatformDensity,
 			),
-			home: Splash()
+			home: Splash(),
+			routes:
+			{
+				"home": (context) => Home()
+			},
 		);
 	}
 }
