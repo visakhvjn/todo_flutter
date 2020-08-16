@@ -21,7 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  wakelock: ^0.1.4+2
+  graphql: ^3.1.0
   flutter:
     sdk: flutter
 
