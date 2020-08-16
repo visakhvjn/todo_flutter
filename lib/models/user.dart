@@ -16,4 +16,20 @@ class User
 	int userId;
 	String name;
 	List<Category> categories = [];
+
+	Category getCategoryDetails(int categoryId)
+	{
+		Category category;
+
+		for(int i = 0; i < this.categories.length; i++)
+		{
+			if (this.categories[i].categoryId == categoryId)
+			{
+				category = this.categories[i];
+				break;
+			}
+		}
+
+		return(category);
+	}
 }

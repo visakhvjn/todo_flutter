@@ -19,6 +19,7 @@ query
 		categories
 		{
 			categoryId,
+			name,
 			created,
 			count,
 			tasks
