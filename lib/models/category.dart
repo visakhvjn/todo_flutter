@@ -9,6 +9,7 @@ class Category
 		this.count = data["count"];
 		this.type = data["type"];
 		this.created = data["created"];
+		this.status = data["status"];
 
 		for (var i = 0; i < data["tasks"].length; i++)
 		{
@@ -22,4 +23,5 @@ class Category
 	List<Task> tasks = [];
 	String type;
 	String created;
+	String status;
 }

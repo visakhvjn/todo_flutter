@@ -1,11 +1,3 @@
-import 'package:graphql/client.dart';
-
-final GraphQLClient graphQLClient = GraphQLClient
-(
-	cache: InMemoryCache(),
-	link: HttpLink(uri: "https://vjnvisakh-todo.herokuapp.com/graphql")
-);
-
 final String getUserData = """
 query
 {
@@ -23,6 +15,7 @@ query
 			type,
 			created,
 			count,
+			status,
 			tasks
 			{
 				taskId,
@@ -41,7 +34,10 @@ mutation(\$name: String!, \$type: String!, \$userId: Int!)
 {
 	createCategory(name: \$name , type: \$type, userId: \$userId)
 	{
-		categoryId, name
+		categoryId, name, type, created, count, tasks
+		{
+			taskId, title, created, description, isCompleted
+		}
 	}
 }
 """;
@@ -51,7 +47,17 @@ mutation(\$title: String!, \$description: String!, \$categoryId: Int!, \$parentI
 {
 	createTask(title: \$title, description: \$description, parentId: \$parentId, categoryId: \$categoryId, userId: \$userId)
 	{
-		taskId
+		taskId, title, created, description, isCompleted
+	}
+}
+""";
+
+final String removeCategory = """
+mutation(\$userId: Int!, \$categoryId: Int!)
+{
+	removeCategory(userId: \$userId, categoryId: \$categoryId)
+	{
+		categoryId
 	}
 }
 """;

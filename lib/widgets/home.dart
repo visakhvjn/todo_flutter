@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:todo/helpers/globals.dart';
 import 'package:todo/widgets/categories.dart';
@@ -12,6 +14,9 @@ class HomeState extends State<Home>
 {
 	TextEditingController categoryNameController = TextEditingController();
 	TextEditingController categoryTypeController = TextEditingController();
+	String categoryTypeValue = "private";
+
+	bool showAddCategoryContainer = false;
 
 	void refresh()
 	{
@@ -21,18 +26,51 @@ class HomeState extends State<Home>
 		{
 			print("Refreshing 1");
 		});
+
+		// gUser.initializeUser();
+	}
+
+	void saveToSharedPreference() async
+	{
+		await sharedPreferences.setString("userData", jsonEncode(gUser.data));
+	}
+
+	addCategory(String name, String type) async
+	{
+		// final MutationOptions options = MutationOptions
+		// (
+		// 	documentNode: gql(createCategoryQuery),
+		// 	variables:
+		// 	{
+		// 		"name": name,
+		// 		"type": type,
+		// 		"userId": gUser.userId
+		// 	},
+		// 	fetchPolicy: FetchPolicy.noCache
+		// );
+
+		// await graphQLClient.mutate(options).then((result)
+		// {
+		// 	var newCategory = result.data["createCategory"];
+
+		// 	gUser.categories.add(Category(newCategory));
+
+		// 	this.setState(() {});
+		// });
 	}
 
 	@override
 	Widget build(BuildContext context)
 	{
+		saveToSharedPreference();
+
 		return RefreshIndicator
 		(
 			onRefresh: () async
 			{
 				refresh();
 			},
-			child: Scaffold
+			child: SafeArea(child: Scaffold
 			(
 				body: Container
 				(
@@ -44,24 +82,21 @@ class HomeState extends State<Home>
 						[
 							Container
 							(
+								padding: EdgeInsets.all(5),
 								height: MediaQuery.of(context).size.height/3.5,
-								color: Colors.black,
-							),
-							Container
-							(
-								color: Theme.of(context).accentColor,
 								width: double.infinity,
-								child: Padding
+								color: Colors.white,
+								child: Card
 								(
-									padding: EdgeInsets.all(10),
-									child: Text("Categories", style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold))
-								)
+
+								),
 							),
 							Expanded
 							(
 								child: Container
 								(
-									color: Theme.of(context).accentColor,
+									padding: EdgeInsets.only(left:7, right: 7, top: 5),
+									color: Colors.white,
 									child: Categories()
 								)
 							)
@@ -71,54 +106,87 @@ class HomeState extends State<Home>
 				floatingActionButton: FloatingActionButton
 				(
 					child: Icon(Icons.add),
-					backgroundColor: Theme.of(context).accentColor,
+					backgroundColor: Theme.of(context).primaryColor,
+					foregroundColor: Theme.of(context).accentColor,
 					onPressed: ()
 					{
+						categoryNameController.text = "";
+						categoryTypeValue = "private";
+
 						return showDialog
 						(
-							useSafeArea: true,
 							context: context,
 							builder: (BuildContext context)
 							{
-								return Container
+								return Center(child:Container
 								(
-									height: 200,
 									child: AlertDialog
 									(
-										title: Text("New Category"),
+										title: Text("New Category", style: TextStyle(fontWeight: FontWeight.bold)),
 										content: Column
 										(
+											crossAxisAlignment: CrossAxisAlignment.start,
 											children:
 											[
+												Text("A Category allows you to group your tasks together."),
+												Padding(padding: EdgeInsets.all(10)),
+												Text("Name", style: TextStyle(fontWeight: FontWeight.bold)),
 												TextFormField
 												(
 													controller: categoryNameController,
-													decoration: InputDecoration(labelText: "Category Name ..."),
+													autofocus: true,
 												),
-												TextFormField
+												Padding(padding: EdgeInsets.all(10)),
+												Text("Type", style: TextStyle(fontWeight: FontWeight.bold)),
+												Container
 												(
-													controller: categoryTypeController,
-													decoration: InputDecoration(labelText: "Type"),
+													width: double.infinity,
+													child: DropdownButton
+													(
+														hint: Text("Type"),
+														value: categoryTypeValue,
+														items:
+														[
+															DropdownMenuItem(child: Text("Private"), value: "private"),
+															DropdownMenuItem(child: Text("Public"), value: "public"),
+														],
+														onChanged: (value)
+														{
+															setState(()
+															{
+																categoryTypeValue = value;
+															});
+														}
+													)
 												),
-												RaisedButton
+												Padding(padding: EdgeInsets.all(10)),
+												Container
 												(
-													child: Text("Add!"),
-													onPressed: () async
-													{
-														await gUser.addCategory(categoryNameController.text, categoryTypeController.text);
-														refresh();
-														Navigator.pop(context);
-													}
-												)
+													width: double.infinity,
+													child: RaisedButton
+													(
+														color: Theme.of(context).primaryColor,
+														textColor: Theme.of(context).accentColor,
+														padding: EdgeInsets.all(15),
+														child: Text("Add Category"),
+														onPressed: () async
+														{
+															this.addCategory(categoryNameController.text, categoryTypeController.text);
+															Navigator.pop(context);
+														}
+													)
+												),
+												Padding(padding: EdgeInsets.all(10)),
+												Text("Public groups are visible to anyone who is following you.", style: TextStyle(fontSize: 15)),
 											],
 										),
 									)
-								);
+								));
 							}
 						);
 					}
 				),
 			)
-		);
+		));
 	}
 }

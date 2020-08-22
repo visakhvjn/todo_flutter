@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:graphql/client.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:todo/helpers/globals.dart';
 import 'package:todo/helpers/graphql.dart';
+import 'package:todo/models/category.dart';
+import 'package:todo/widgets/home.dart';
 
 class Splash extends StatefulWidget
 {
@@ -14,28 +16,44 @@ class Splash extends StatefulWidget
 class SplashState extends State<Splash>
 {
 	var loaderVisible = true;
+	bool showSplash = true;
 
-	void initState()
+	loadInitialData() async
 	{
-		super.initState();
-		loadIntialUserData();
-	}
-
-	void loadIntialUserData() async
-	{
-		final QueryOptions options = QueryOptions
+		return Query
 		(
-			documentNode: gql(getUserData)
-		);
+			options: QueryOptions
+			(
+				documentNode: gql(getUserData),
+				fetchPolicy: FetchPolicy.noCache
+			),
+			builder: (QueryResult result, { VoidCallback refetch, FetchMore fetchMore })
+			{
+				if (result.loading)
+				{
+					return splash();
+				}
+				else
+				{
+					var data = result.data["user"];
 
-		await graphQLClient.query(options).then((result)
-		{
-			gUser.init(result.data["user"]);
-			Navigator.pushReplacementNamed(context, "home");
-		});
+					gUser.userId = data["userId"];
+					gUser.name = data["name"];
+					gUser.categories = [];
+					gUser.data = data;
+
+					for (var i = 0; i < data["categories"].length; i++)
+					{
+						gUser.categories.add(Category(data["categories"][i]));
+					}
+
+					return Home();
+				}
+			},
+		);
 	}
 
-	Widget build(BuildContext context)
+	Widget splash()
 	{
 		return Scaffold
 		(
@@ -52,7 +70,6 @@ class SplashState extends State<Splash>
 						[
 							Icon(Icons.track_changes, size: 150),
 							Text("Task Manager", style: TextStyle(fontSize: 30)),
-							Divider(),
 							Text("Loading User Data", style: TextStyle(color: Theme.of(context).accentColor)),
 							Padding(padding: EdgeInsets.all(10)),
 							CircularProgressIndicator(),
@@ -61,5 +78,11 @@ class SplashState extends State<Splash>
 				)
 			)
 		);
+	}
+
+	Widget build(BuildContext context)
+	{
+		// return splash();
+		return loadInitialData();
 	}
 }
